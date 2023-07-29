@@ -9,10 +9,7 @@ class IngredientAdmin(admin.ModelAdmin):
         'name',
         'measurement_unit',
     )
-    fields = (
-        'name',
-        'measurement_unit',
-    )
+    ordering = ['name']
     empty_value_display = '-пусто-'
 
 
@@ -20,29 +17,15 @@ class IngredientAdmin(admin.ModelAdmin):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'image',
-        'text',
-        'cooking_time',
         'author',
     )
-    fields = (
-        'name',
-        'image',
-        'text',
-        'cooking_time',
-        'author',
-    )
+    list_filter = ('author', 'name', 'tags')
     empty_value_display = '-пусто-'
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'name',
-        'color',
-        'slug',
-    )
-    fields = (
         'name',
         'color',
         'slug',
