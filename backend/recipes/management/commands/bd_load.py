@@ -18,7 +18,7 @@ class Command(BaseCommand):
             try:
                 data = json.load(file)
                 for index, row in enumerate(data):
-                    data[index]['id'] = index + 1
+                    data[index]['id'] = index
                 records = [Ingredient(**row) for row in data]
                 Ingredient.objects.bulk_create(records)
                 self.stdout.write(
