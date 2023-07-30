@@ -36,7 +36,7 @@ class Ingredient(models.Model):
         verbose_name='Название ингредиента',
     )
     measurement_unit = models.CharField(
-        max_length=30,
+        max_length=100,
         verbose_name='Единица измерения',
     )
 
@@ -73,7 +73,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         'Ingredient',
-        related_name='recipes',
+        through='IngredientRecipe',
         verbose_name='Ингредиенты',
     )
     tags = models.ManyToManyField(
@@ -91,3 +91,23 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class IngredientRecipe(models.Model):
+    """Связная модель Ингредиент-Рецепт."""
+
+    ingredient = models.ForeignKey(
+        'Ingredient',
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        'Recipe',
+        related_name='recipe_ingredients',
+        on_delete=models.CASCADE,
+    )
+    amount = models.PositiveIntegerField(
+        verbose_name='Количество',
+    )
+
+    def __str__(self):
+        return f'{self.ingredient} - {self.recipe}'

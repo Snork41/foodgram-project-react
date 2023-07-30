@@ -1,6 +1,12 @@
 from django.contrib import admin
+from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
 
-from recipes.models import Ingredient, Recipe, Tag
+
+class IngredientsInline(admin.TabularInline):
+    model = IngredientRecipe
+    extra = 5
+    verbose_name = 'Ингредиент'
+    verbose_name_plural = 'Ингредиенты'
 
 
 @admin.register(Ingredient)
@@ -21,6 +27,7 @@ class RecipeAdmin(admin.ModelAdmin):
     )
     list_filter = ('author', 'name', 'tags')
     empty_value_display = '-пусто-'
+    inlines = (IngredientsInline,)
 
 
 @admin.register(Tag)
