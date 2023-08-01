@@ -1,6 +1,20 @@
+import base64
+
+from django.core.files.base import ContentFile
 from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
 from rest_framework import serializers
 from users.serializers import UserSerializer
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            imgformat, imgstr = data.split(';base64,')
+            extension = imgformat.split('/')[-1]
+            data = ContentFile(
+                base64.b64decode(imgstr), name='image.' + extension
+            )
+        return super().to_internal_value(data)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -65,7 +79,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField()
+    author = UserSerializer()
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientRecipeSerializer(
         many=True,
@@ -97,6 +111,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True
     )
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe

@@ -1,6 +1,7 @@
 from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import viewsets
 
+from .pagination import RecipesPagination
 from .serializers import (IngredientSerializer, RecipeGetSerializer,
                           RecipeWriteSerializer, TagSerializer)
 
@@ -17,6 +18,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    pagination_class = RecipesPagination
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
