@@ -1,6 +1,8 @@
 from django.contrib import admin
 from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
 
+admin.site.site_header = '"FOODGRAM" | Администрирование'
+
 
 class IngredientsInline(admin.TabularInline):
     model = IngredientRecipe
@@ -38,6 +40,3 @@ class TagAdmin(admin.ModelAdmin):
         'slug',
     )
     empty_value_display = '-пусто-'
-
-
-admin.site.site_header = '"FOODGRAM" | Администрирование'

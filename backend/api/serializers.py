@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
+from rest_framework import serializers
+from users.serializers import UserSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -36,6 +37,20 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
         )
 
 
+class IngredientForRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(),
+    )
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = IngredientRecipe
+        fields = (
+            'id',
+            'amount',
+        )
+
+
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -50,6 +65,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField()
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientRecipeSerializer(
         many=True,
@@ -72,8 +88,15 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
-    ingredients = IngredientRecipeSerializer(many=True)
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
+    ingredients = IngredientForRecipeSerializer(
+        many=True,
+        write_only=True
+    )
 
     class Meta:
         model = Recipe
@@ -88,9 +111,27 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-    # def create(self, validated_data):
-    #     ingredients = validated_data.pop('ingredients')
-    #     recipe = Recipe.objects.create(**validated_data)
-    #     for ingredient in ingredients:
-    #         current_ingredient, status = Ingredient.objects.get(**ingredient)
-    #     return super().create(validated_data)
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient in ingredients:
+            IngredientRecipe.objects.create(
+                recipe=recipe,
+                ingredient=ingredient['id'],
+                amount=ingredient['amount']
+                )
+        recipe.tags.set(tags)
+        return recipe
+
+    def to_representation(self, instance):
+        recipe = super().to_representation(instance)
+        recipe['ingredients'] = IngredientRecipeSerializer(
+            instance.recipe_ingredients.all(),
+            many=True).data
+        recipe['tags'] = TagSerializer(instance.tags.all(), many=True).data
+        recipe['author'] = UserSerializer(instance.author).data
+        return recipe
+
+    # def update(self, instance, validated_data):
+    #     return None
