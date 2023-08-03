@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from recipes.models import Ingredient, IngredientRecipe, Favorite, Recipe, Tag
+from recipes.models import (Ingredient, IngredientRecipe,
+                            Favorite, Recipe, Tag, ShoppingCart)
 
 admin.site.site_header = '"FOODGRAM" | Администрирование'
 
@@ -46,6 +47,14 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
-        'author',
+        'user',
+        'recipe',
+    )
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
         'recipe',
     )
