@@ -1,5 +1,6 @@
 from django.contrib import admin
-from recipes.models import Ingredient, IngredientRecipe, Recipe, Tag
+
+from recipes.models import Ingredient, IngredientRecipe, Favorite, Recipe, Tag
 
 admin.site.site_header = '"FOODGRAM" | Администрирование'
 
@@ -17,7 +18,7 @@ class IngredientAdmin(admin.ModelAdmin):
         'name',
         'measurement_unit',
     )
-    ordering = ['name']
+    ordering = ['id']
     empty_value_display = '-пусто-'
 
 
@@ -40,3 +41,11 @@ class TagAdmin(admin.ModelAdmin):
         'slug',
     )
     empty_value_display = '-пусто-'
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = (
+        'author',
+        'recipe',
+    )

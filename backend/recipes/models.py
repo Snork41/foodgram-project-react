@@ -109,3 +109,33 @@ class IngredientRecipe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} - {self.recipe}'
+
+
+class Favorite(models.Model):
+    """Избранное."""
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='ravorite',
+        verbose_name='Автор рецепта',
+    )
+
+    recipe = models.ForeignKey(
+        'Recipe',
+        on_delete=models.CASCADE,
+        related_name='favorite',
+        verbose_name='Рецепт',
+    )
+
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
+    def __str__(self):
+        return self.recipe
+
+
+# class ShoppingCart(models.Model):
+#     """Корзина."""
+#     pass
