@@ -82,6 +82,10 @@ class Recipe(models.Model):
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления (в минутах)',
     )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации рецепта',
+        auto_now_add=True,
+    )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -159,3 +163,25 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return self.recipe.name
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Подписчик',
+        related_name='follower',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор',
+        related_name='following',
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.author}'
