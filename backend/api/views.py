@@ -6,10 +6,11 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.filters import RecipeFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag, IngredientRecipe
-from .pagination import RecipesPagination
-from .serializers import (FavoriteSerializer, IngredientSerializer,
+
+from api.filters import RecipeFilter
+from api.pagination import RecipesPagination
+from api.serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeGetSerializer, RecipeWriteSerializer,
                           ShoppingCartSerializer, TagSerializer)
 

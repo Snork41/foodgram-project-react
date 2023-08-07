@@ -236,3 +236,22 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         recipe['tags'] = TagSerializer(instance.tags.all(), many=True).data
         recipe['author'] = UserSerializer(instance.author).data
         return recipe
+
+    def validate_tags(self, tags):
+        if not tags:
+            raise serializers.ValidationError('Выберите тег!')
+        if len(tags) > len(set(tags)):
+            raise serializers.ValidationError('Теги нельзя повторять!')
+        return tags
+
+    def validate_ingredients(self, ingredients):
+        list_ingredients = []
+        if not ingredients:
+            raise serializers.ValidationError('Выберите ингредиенты!')
+        for ingredient in ingredients:
+            if not ingredient['amount']:
+                raise serializers.ValidationError('Количество ингредиента должно быть больше 0!')
+            if ingredient['id'] in list_ingredients:
+                raise serializers.ValidationError('Ингредиенты не должны повторяться!')
+            list_ingredients.append(ingredient['id'])
+        return ingredients
