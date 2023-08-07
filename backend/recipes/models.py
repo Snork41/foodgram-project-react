@@ -166,6 +166,8 @@ class ShoppingCart(models.Model):
 
 
 class Follow(models.Model):
+    """Подписка."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

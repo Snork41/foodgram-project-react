@@ -1,3 +1,5 @@
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
@@ -5,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.filters import RecipeFilter
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag, IngredientRecipe
 from .pagination import RecipesPagination
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeGetSerializer, RecipeWriteSerializer,
@@ -90,3 +92,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         ShoppingCart.objects.get(recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[permissions.IsAuthenticated])
+    def download_shopping_cart(self, request, *args, **kwargs):
+        ingredients = IngredientRecipe.objects.filter(
+            recipe_id__shopping_cart__user=self.request.user).values(
+            'ingredient__name', 'ingredient__measurement_unit').annotate(
+            amount=Sum('amount')
+        )
+        shopping_list = ['>>>СПИСОК НЕОБХОДИМЫХ ИНГРЕДИЕНТОВ<<<\n']
+        for index, ingredient in enumerate(ingredients, 1):
+            raw = [
+                str(index) + '.',
+                ingredient['ingredient__name'].title() + ' -',
+                str(ingredient['amount']),
+                ingredient['ingredient__measurement_unit']
+            ]
+            shopping_list.append(' '.join(raw))
+        response = HttpResponse(
+            '\n'.join(shopping_list), content_type='text/plain'
+        )
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_list.txt"'
+        )
+        return response
