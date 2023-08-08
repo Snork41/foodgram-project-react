@@ -250,8 +250,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Выберите ингредиенты!')
         for ingredient in ingredients:
             if not ingredient['amount']:
-                raise serializers.ValidationError('Количество ингредиента должно быть больше 0!')
+                raise serializers.ValidationError(
+                    'Количество ингредиента должно быть больше 0!'
+                )
             if ingredient['id'] in list_ingredients:
-                raise serializers.ValidationError('Ингредиенты не должны повторяться!')
+                raise serializers.ValidationError(
+                    'Ингредиенты не должны повторяться!'
+                )
             list_ingredients.append(ingredient['id'])
         return ingredients

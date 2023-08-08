@@ -2,22 +2,26 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag, IngredientRecipe
+from recipes.models import (Favorite, Ingredient, Recipe, ShoppingCart,
+                            Tag, IngredientRecipe)
 
 from api.filters import RecipeFilter
 from api.pagination import RecipesPagination
+from api.permissions import IsAuthorOrAdminOrReadOnly
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeGetSerializer, RecipeWriteSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+                            RecipeGetSerializer, RecipeWriteSerializer,
+                            ShoppingCartSerializer, TagSerializer)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^name',)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -30,6 +34,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = RecipesPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    permission_classes = (IsAuthorOrAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):

@@ -7,15 +7,16 @@ class Tag(models.Model):
     """Тег."""
 
     name = models.CharField(
-        max_length=50,
+        max_length=200,
         unique=True,
         verbose_name='Тег',
     )
     color = models.CharField(
-        max_length=50,
+        max_length=7,
         verbose_name='Цветовой код',
     )
     slug = models.SlugField(
+        max_length=200,
         unique=True,
     )
 
@@ -35,7 +36,7 @@ class Ingredient(models.Model):
         verbose_name='Название ингредиента',
     )
     measurement_unit = models.CharField(
-        max_length=100,
+        max_length=200,
         verbose_name='Единица измерения',
     )
 
