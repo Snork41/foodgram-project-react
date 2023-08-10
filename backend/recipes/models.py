@@ -6,23 +6,45 @@ from users.models import User
 class Tag(models.Model):
     """Тег."""
 
+    BREAKFAST = 'Завтрак'
+    DINNER = 'Обед'
+    SUPPER = 'Ужин'
+    TAG_NAME_CHOICES = [
+        (BREAKFAST, 'Завтрак'),
+        (DINNER, 'Обед'),
+        (SUPPER, 'Ужин')
+    ]
     name = models.CharField(
+        choices=TAG_NAME_CHOICES,
+        default=BREAKFAST,
         max_length=200,
         unique=True,
-        verbose_name='Тег',
+        verbose_name='Имя тега',
     )
     color = models.CharField(
         max_length=7,
+        blank=True,
         verbose_name='Цветовой код',
     )
     slug = models.SlugField(
         max_length=200,
         unique=True,
+        blank=True,
+        verbose_name='Слаг',
     )
 
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
+    def save(self, *args, **kwargs):
+        tags = {
+            self.BREAKFAST: ('#f21624', 'breakfast'),
+            self.DINNER: ('#28f216', 'dinner'),
+            self.SUPPER: ('#b716f2', 'supper')
+        }
+        self.color, self.slug = tags[self.name]
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

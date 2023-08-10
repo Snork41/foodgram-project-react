@@ -1,21 +1,32 @@
 from rest_framework import serializers
-
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Follow
 from users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class UserCreateSerializer(UserCreateSerializer):
 
     class Meta:
         model = User
         fields = (
             'email',
-            'id',
             'username',
             'first_name',
             'last_name',
             'password',
+        )
+
+
+class UserSerializer(UserSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
         )
 
 

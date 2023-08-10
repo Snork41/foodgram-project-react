@@ -61,7 +61,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
-            return
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if not favorite_exists:
             return Response(
                 {"errors": "Рецепт не находится в избранном!"},
@@ -90,7 +93,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
-            return
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if not in_cart:
             return Response(
                 {"errors": "Рецепт не находится в списке покупок!"},
