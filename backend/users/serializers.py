@@ -1,7 +1,8 @@
-from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import Follow
-from users.models import User
+from rest_framework import serializers
+
+from recipes.models import Recipe
+from users.models import Follow, User
 
 
 class UserCreateSerializer(UserCreateSerializer):
@@ -10,6 +11,7 @@ class UserCreateSerializer(UserCreateSerializer):
         model = User
         fields = (
             'email',
+            'id',
             'username',
             'first_name',
             'last_name',
@@ -18,16 +20,37 @@ class UserCreateSerializer(UserCreateSerializer):
 
 
 class UserSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
-            'id',
             'email',
+            'id',
             'username',
             'first_name',
             'last_name',
+            'is_subscribed',
         )
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return user.follower.filter(author=obj).exists()
+        return False
+
+
+class RecipeInFollowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )
+        read_only_fields = ('__all__',)
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -52,7 +75,11 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only=True
     )
     is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
+    recipes = RecipeInFollowSerializer(
+        many=True,
+        read_only=True,
+        source='author.recipes'
+    )
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -67,3 +94,12 @@ class FollowSerializer(serializers.ModelSerializer):
             'recipes',
             'recipes_count',
         )
+
+    def get_is_subscribed(self, obj):
+        if obj.user.is_authenticated:
+            return Follow.objects.filter(
+                user=obj.user, author=obj.author).exists()
+        return False
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.author).count()

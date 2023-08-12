@@ -1,7 +1,8 @@
 import base64
 
+from django.db import transaction
 from django.core.files.base import ContentFile
-from recipes.models import (Favorite, Follow, Ingredient, IngredientRecipe,
+from recipes.models import (Favorite, Ingredient, IngredientRecipe,
                             Recipe, ShoppingCart, Tag)
 from rest_framework import serializers
 from users.serializers import UserSerializer
@@ -199,6 +200,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')

@@ -6,15 +6,14 @@ from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.models import (Favorite, Ingredient, Recipe, ShoppingCart,
-                            Tag, IngredientRecipe)
-
 from api.filters import RecipeFilter
 from api.pagination import RecipesPagination
 from api.permissions import IsAuthorOrAdminOrReadOnly
 from api.serializers import (FavoriteSerializer, IngredientSerializer,
-                            RecipeGetSerializer, RecipeWriteSerializer,
-                            ShoppingCartSerializer, TagSerializer)
+                             RecipeGetSerializer, RecipeWriteSerializer,
+                             ShoppingCartSerializer, TagSerializer)
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingCart, Tag)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
