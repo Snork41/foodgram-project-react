@@ -75,11 +75,7 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only=True
     )
     is_subscribed = serializers.SerializerMethodField()
-    recipes = RecipeInFollowSerializer(
-        many=True,
-        read_only=True,
-        source='author.recipes'
-    )
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -100,6 +96,14 @@ class FollowSerializer(serializers.ModelSerializer):
             return Follow.objects.filter(
                 user=obj.user, author=obj.author).exists()
         return False
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        recipes = Recipe.objects.filter(author=obj.author)
+        if limit and limit.isdigit():
+            recipes = recipes[:int(limit)]
+        return RecipeInFollowSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()

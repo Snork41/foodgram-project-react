@@ -69,7 +69,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {"errors": "Рецепт не находится в избранном!"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        Favorite.objects.get(recipe=recipe).delete()
+        Favorite.objects.get(recipe=recipe, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post', 'delete'],
@@ -101,7 +101,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {"errors": "Рецепт не находится в списке покупок!"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        ShoppingCart.objects.get(recipe=recipe).delete()
+        ShoppingCart.objects.get(recipe=recipe, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
@@ -113,6 +113,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount=Sum('amount')
         )
         shopping_list = ['>>>СПИСОК НЕОБХОДИМЫХ ИНГРЕДИЕНТОВ<<<\n']
+        if not ingredients:
+            shopping_list.append('УПС! Ваш список пуст :(')
         for index, ingredient in enumerate(ingredients, 1):
             raw = [
                 str(index) + '.',

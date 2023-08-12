@@ -1,22 +1,10 @@
-import base64
-
 from django.db import transaction
-from django.core.files.base import ContentFile
+from rest_framework import serializers
+
+from api.services import Base64ImageField
 from recipes.models import (Favorite, Ingredient, IngredientRecipe,
                             Recipe, ShoppingCart, Tag)
-from rest_framework import serializers
 from users.serializers import UserSerializer
-
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            imgformat, imgstr = data.split(';base64,')
-            extension = imgformat.split('/')[-1]
-            data = ContentFile(
-                base64.b64decode(imgstr), name='image.' + extension
-            )
-        return super().to_internal_value(data)
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -214,6 +202,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -231,13 +220,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return recipe
 
     def to_representation(self, instance):
-        recipe = super().to_representation(instance)
-        recipe['ingredients'] = IngredientRecipeSerializer(
-            instance.recipe_ingredients.all(),
-            many=True).data
-        recipe['tags'] = TagSerializer(instance.tags.all(), many=True).data
-        recipe['author'] = UserSerializer(instance.author).data
-        return recipe
+        return RecipeGetSerializer(
+            instance,
+            context={'request': self.context.get('request')}).data
 
     def validate_tags(self, tags):
         if not tags:

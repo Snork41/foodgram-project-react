@@ -4,7 +4,6 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import IsAuthorOrAdminOrReadOnly
 from users.models import Follow, User
 from users.pagination import UsersPagination
 from users.serializers import FollowSerializer, UserSerializer
@@ -14,15 +13,7 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = UsersPagination
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
-
-    @action(methods=['get'],
-            detail=False,
-            permission_classes=[permissions.IsAuthenticated])
-    def me(self, request, *args, **kwargs):
-        serializer = UserSerializer(
-            self.request.user, context={'request': request})
-        return Response(serializer.data)
+    permission_classes = (permissions.IsAuthenticated,)
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
@@ -52,7 +43,9 @@ class UserViewSet(UserViewSet):
                     {"errors": "Нельзя подписаться на себя самого!"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            serializer = FollowSerializer(data=request.data)
+            serializer = FollowSerializer(
+                data=request.data,
+                context={'request': request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save(user=follower, author=following)
                 return Response(serializer.data)
