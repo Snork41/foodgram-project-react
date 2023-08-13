@@ -198,7 +198,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 recipe=recipe,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount']
-                )
+            )
         recipe.tags.set(tags)
         return recipe
 
@@ -215,7 +215,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 recipe=recipe,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount']
-                )
+            )
         recipe.tags.set(tags)
         return recipe
 
