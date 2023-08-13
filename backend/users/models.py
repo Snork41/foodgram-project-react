@@ -3,18 +3,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-    USER_ROLE = 'user'
-    ADMIN_ROLE = 'admin'
-    ROLE_CHOICES = [
-        (USER_ROLE, 'User'),
-        (ADMIN_ROLE, 'Administrator'),
-    ]
-    role = models.CharField(
-        choices=ROLE_CHOICES,
-        default=USER_ROLE,
-        max_length=30,
-        verbose_name='Пользовательская роль'
-    )
     email = models.EmailField(
         max_length=254,
         unique=True,

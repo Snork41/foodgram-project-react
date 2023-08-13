@@ -21,6 +21,7 @@ class IngredientAdmin(admin.ModelAdmin):
     )
     ordering = ['id']
     empty_value_display = '-пусто-'
+    list_filter = ('name',)
 
 
 @admin.register(Recipe)
@@ -28,11 +29,16 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'author',
+        'amount_favorites',
     )
     list_filter = ('author', 'name', 'tags')
     filter_horizontal = ('tags',)
     empty_value_display = '-пусто-'
     inlines = (IngredientsInline,)
+
+    def amount_favorites(self, obj):
+        return obj.favorite.count()
+    amount_favorites.short_description = 'Количество добавлений в избранное'
 
 
 @admin.register(Tag)
