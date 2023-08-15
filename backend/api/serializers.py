@@ -188,36 +188,36 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+    def add_ingredients_and_tags(self, ingredients, tags, recipe):
+        ingredient_recipe = []
+        for ingredient in ingredients:
+            ingredient_recipe.append(
+                IngredientRecipe(
+                    recipe=recipe,
+                    ingredient=ingredient['id'],
+                    amount=ingredient['amount']
+                )
+            )
+        IngredientRecipe.objects.bulk_create(ingredient_recipe)
+        recipe.tags.set(tags)
+        return recipe
+
     @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        for ingredient in ingredients:
-            IngredientRecipe.objects.create(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            )
-        recipe.tags.set(tags)
-        return recipe
+        return self.add_ingredients_and_tags(ingredients, tags, recipe)
 
     @transaction.atomic
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        Recipe.objects.filter(name=instance.name).update(**validated_data)
+        super().update(instance, validated_data)
         recipe = Recipe.objects.get(name=instance.name)
         instance.ingredients.clear()
         instance.tags.clear()
-        for ingredient in ingredients:
-            IngredientRecipe.objects.update_or_create(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            )
-        recipe.tags.set(tags)
-        return recipe
+        return self.add_ingredients_and_tags(ingredients, tags, recipe)
 
     def to_representation(self, instance):
         return RecipeGetSerializer(

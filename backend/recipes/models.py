@@ -140,6 +140,13 @@ class IngredientRecipe(models.Model):
             1, message='Минимальное количество - 1')]
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_ingredient_in_recipe'),
+        ]
+
     def __str__(self):
         return f'{self.ingredient} - {self.recipe}'
 
@@ -164,6 +171,11 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Рецепт в списке избранных'
         verbose_name_plural = 'Рецепты в списке избранных'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_favorite'),
+        ]
 
     def __str__(self):
         return self.recipe.name
@@ -189,6 +201,11 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Рецепт в корзине'
         verbose_name_plural = 'Рецепты в корзине'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_cart'),
+        ]
 
     def __str__(self):
         return self.recipe.name

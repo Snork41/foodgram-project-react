@@ -46,13 +46,9 @@ class UserViewSet(UserViewSet):
             serializer = FollowSerializer(
                 data=request.data,
                 context={'request': request})
-            if serializer.is_valid(raise_exception=True):
-                serializer.save(user=follower, author=following)
-                return Response(serializer.data)
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=follower, author=following)
+            return Response(serializer.data)
         if not follow_exists:
             return Response(
                 {"errors": "Вы не подписаны на этого автора!"},
