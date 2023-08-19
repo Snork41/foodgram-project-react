@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -40,10 +39,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'foodgram_backend.urls'
 
 TEMPLATES = [
@@ -66,10 +63,14 @@ WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': os.getenv('POSTGRES_DB', 'django'),
+       'USER': os.getenv('POSTGRES_USER', 'django'),
+       'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+       'HOST': os.getenv('DB_HOST', ''),
+       'PORT': os.getenv('DB_PORT', 5432)
+   }
 }
 
 
@@ -98,7 +99,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
