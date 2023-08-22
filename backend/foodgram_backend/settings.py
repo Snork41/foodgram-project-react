@@ -133,3 +133,5 @@ DJOSER = {
         'user_create': 'users.serializers.UserCreateSerializer',
     },
 }
+
+CSRF_TRUSTED_ORIGINS = ['https://foodgram41.ddns.net']
