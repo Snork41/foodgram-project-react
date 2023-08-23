@@ -236,7 +236,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         if not ingredients:
             raise serializers.ValidationError('Выберите ингредиенты!')
         for ingredient in ingredients:
-            if not ingredient['amount']:
+            if ingredient['amount'] < 1:
                 raise serializers.ValidationError(
                     'Количество ингредиента должно быть больше 0!'
                 )

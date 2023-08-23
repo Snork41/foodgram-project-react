@@ -4,25 +4,23 @@ volumes:
   pg_data:
   static:
   media:
-  #redoc:
 
 services:
 
   db:
     image: postgres:15.4
-    env_file: ../.env
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   backend:
     image: maxsnork/foodgram_backend
-    env_file: ../.env
+    env_file: .env
     depends_on:
       - db
     volumes:
       - static:/app/static/
       - media:/app/media/
-      #- redoc:/app/api/docs/
 
   frontend:
     image: maxsnork/foodgram_frontend
@@ -37,7 +35,6 @@ services:
       - static:/var/html/static/
       - media:/var/html/media/
       - ../frontend/build:/usr/share/nginx/html/
-      #- redoc:/usr/share/nginx/html/api/docs/
       - ../docs/:/usr/share/nginx/html/api/docs/
 
     depends_on:
